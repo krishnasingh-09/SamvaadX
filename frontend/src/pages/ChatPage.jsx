@@ -34,7 +34,7 @@ function ChatPage() {
   }, [socket, isInitialized, getPendingRequests, subscribeToChatRequests, unsubscribeFromChatRequests])
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-slate-900 overflow-hidden">
+    <div className="relative w-full max-w-6xl h-[800px]">
       <BorderAnimatedContainer>
         {/* LEFT SIDE */}
         <div className="w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col">
