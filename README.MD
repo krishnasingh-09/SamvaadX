@@ -6,6 +6,11 @@ SamvaadX is a modern, full-stack real-time chat application built with the MERN 
 
 ---
 
+## 🚀 Live Demo
+
+**[Visit SamvaadX Live](https://samvaad-x-znx1.vercel.app/)**
+
+
 ## Table of Contents
 
 - [Features](#features)
