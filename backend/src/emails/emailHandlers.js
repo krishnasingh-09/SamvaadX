@@ -7,39 +7,46 @@ import {
 
 import { resend, sender } from "../lib/resend.js";
 
-/**
- * Send welcome email
- */
+const sendEmail = async ({ to, subject, html }) => {
+  if (!resend) {
+    console.log("⚠️ Email skipped (Resend not configured)");
+    return true; // do NOT block signup
+  }
+
+  await resend.emails.send({
+    from: `${sender.name} <${sender.email}>`,
+    to,
+    subject,
+    html,
+  });
+
+  return true;
+};
+
 export const sendWelcomeEmail = async (email, name, clientURL) => {
   try {
-    await resend.emails.send({
-      from: `${sender.name} <${sender.email}>`,
+    await sendEmail({
       to: email,
       subject: "Welcome to SamvaadX!",
       html: createWelcomeEmailTemplate(name, clientURL),
     });
-
-    console.log("✅ Welcome email sent");
     return true;
-  } catch (error) {
-    console.error("❌ Welcome email failed:", error.message);
+  } catch (e) {
+    console.error("Welcome email failed:", e.message);
     return false;
   }
 };
 
 export const sendOTPEmail = async (email, name, otp, otpExpiry) => {
   try {
-    await resend.emails.send({
-      from: `${sender.name} <${sender.email}>`,
+    await sendEmail({
       to: email,
       subject: "Your OTP for SamvaadX Email Verification",
       html: createOTPEmailTemplate(name, otp, otpExpiry),
     });
-
-    console.log("✅ OTP email sent");
     return true;
-  } catch (error) {
-    console.error("❌ OTP email failed:", error.message);
+  } catch (e) {
+    console.error("OTP email failed:", e.message);
     return false;
   }
 };
@@ -51,8 +58,7 @@ export const sendEmailVerificationEmail = async (
   tokenExpiry
 ) => {
   try {
-    await resend.emails.send({
-      from: `${sender.name} <${sender.email}>`,
+    await sendEmail({
       to: email,
       subject: "Verify Your Email - SamvaadX",
       html: createEmailVerificationTemplate(
@@ -61,11 +67,9 @@ export const sendEmailVerificationEmail = async (
         tokenExpiry
       ),
     });
-
-    console.log("✅ Verification email sent");
     return true;
-  } catch (error) {
-    console.error("❌ Verification email failed:", error.message);
+  } catch (e) {
+    console.error("Verification email failed:", e.message);
     return false;
   }
 };
@@ -77,20 +81,18 @@ export const sendPasswordResetOTPEmail = async (
   otpExpiry
 ) => {
   try {
-    await resend.emails.send({
-      from: `${sender.name} <${sender.email}>`,
+    await sendEmail({
       to: email,
       subject: "Password Reset OTP - SamvaadX",
       html: createPasswordResetOTPTemplate(name, otp, otpExpiry),
     });
-
-    console.log("✅ Password reset OTP email sent");
     return true;
-  } catch (error) {
-    console.error("❌ Password reset OTP email failed:", error.message);
+  } catch (e) {
+    console.error("Password reset OTP failed:", e.message);
     return false;
   }
 };
+
 
 
 
