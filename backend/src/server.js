@@ -23,17 +23,13 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow server-to-server / curl / render health checks
+    // Allow requests with no origin (mobile apps, curl, health checks)
     if (!origin) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    // IMPORTANT: do NOT throw error
-    return callback(null, false);
+    // Always reflect the requesting origin
+    return callback(null, origin);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
