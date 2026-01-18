@@ -19,15 +19,21 @@ const allowedOrigins = [
   "http://localhost:3000",
   ENV.CLIENT_URL,
   ENV.SOCKET_IO_CORS_ORIGIN,
-];
+].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+    // Allow server-to-server / curl / render health checks
+    if (!origin) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error("Not allowed by CORS"));
+
+    // IMPORTANT: do NOT throw error
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -36,6 +42,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
 // ======================
 
 app.use(express.json({ limit: "5mb" }));
