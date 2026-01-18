@@ -7,11 +7,32 @@ import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: [ENV.CLIENT_URL],
-    credentials: true,
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      // Development
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:3000",
+      // Production - Vercel Frontend
+      "https://samvaad-x-zxnv1.vercel.app",
+      // Production - Render Backend
+      "https://samvaadx-backend.onrender.com",
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   },
+  credentials: true,
+  methods: ["GET", "POST"],
+};
+
+const io = new Server(server, {
+  cors: corsOptions,
 });
 
 // apply authentication middleware to all socket connections
@@ -43,6 +64,7 @@ io.on("connection", (socket) => {
 });
 
 export { io, app, server };
+
 
 
 // import { Server } from "socket.io";
