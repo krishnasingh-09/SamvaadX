@@ -117,21 +117,29 @@ export const useAuthStore = create((set, get) => ({
   },
 
   connectSocket: () => {
-    const { authUser } = get()
-    if (!authUser || get().socket?.connected) return
+  const { authUser } = get();
+  if (!authUser || get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
-      withCredentials: true,
-    })
+  const socket = io(import.meta.env.VITE_BACKEND_URL, {
+    withCredentials: true,
+    transports: ["polling", "websocket"],
+  });
 
-    socket.connect()
+  set({ socket });
 
-    set({ socket })
+  socket.on("connect", () => {
+    console.log("Socket connected:", socket.id);
+  });
 
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds })
-    })
-  },
+  socket.on("getOnlineUsers", (userIds) => {
+    set({ onlineUsers: userIds });
+  });
+
+  socket.on("connect_error", (err) => {
+    console.error("Socket connection error:", err.message);
+  });
+},
+
 
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect()

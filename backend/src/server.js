@@ -13,31 +13,30 @@ import { app, server } from "./lib/socket.js";
 const __dirname = path.resolve();
 const PORT = ENV.PORT || 3000;
 
-// ===== CORS FIX =====
+// ===== CORS CONFIG =====
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  process.env.CLIENT_URL,
-  process.env.SOCKET_IO_CORS_ORIGIN,
+  ENV.CLIENT_URL,
+  ENV.SOCKET_IO_CORS_ORIGIN,
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-app.options("*", cors());
-// ====================
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+// ======================
 
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
@@ -61,6 +60,7 @@ server.listen(PORT, () => {
   console.log("Server running on port: " + PORT);
   connectDB();
 });
+
 
 
 
