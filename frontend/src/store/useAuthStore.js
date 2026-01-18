@@ -18,7 +18,8 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axiosInstance.get("/auth/check")
+      // const res = await axiosInstance.get("/auth/check")
+      const res = await axiosInstance.get("/check")
       set({ authUser: res.data })
       get().connectSocket()
     } catch (error) {
@@ -58,7 +59,8 @@ export const useAuthStore = create((set, get) => ({
   verifyOTP: async (email, otp, navigate) => {
     set({ isVerifyingOTP: true })
     try {
-      const res = await axiosInstance.post("/auth/verify-otp", { email, otp })
+      // const res = await axiosInstance.post("/auth/verify-otp", { email, otp })
+      const res = await axiosInstance.post("/verify-otp", { email, otp })
       set({ authUser: res.data })
       toast.success("Email verified successfully! Account created.")
       get().connectSocket()
@@ -75,7 +77,8 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true })
     try {
-      const res = await axiosInstance.post("/auth/login", data)
+      // const res = await axiosInstance.post("/auth/login", data)
+      const res = await axiosInstance.post("/login", data)
       set({ authUser: res.data })
 
       toast.success("Logged in successfully")
@@ -90,7 +93,8 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout")
+      // await axiosInstance.post("/auth/logout")
+      await axiosInstance.post("/logout")
       set({ authUser: null })
       toast.success("Logged out successfully")
       get().disconnectSocket()
@@ -102,7 +106,8 @@ export const useAuthStore = create((set, get) => ({
 
   updateProfile: async (data) => {
     try {
-      const res = await axiosInstance.put("/auth/update-profile", data)
+      // const res = await axiosInstance.put("/auth/update-profile", data)
+      const res = await axiosInstance.put("/update-profile", data)
       set({ authUser: res.data })
       toast.success("Profile updated successfully")
     } catch (error) {
@@ -135,7 +140,8 @@ export const useAuthStore = create((set, get) => ({
   forgotPassword: async (email) => {
     set({ isSendingResetOTP: true })
     try {
-      const res = await axiosInstance.post("/auth/forgot-password", { email })
+      // const res = await axiosInstance.post("/auth/forgot-password", { email })
+      const res = await axiosInstance.post("/forgot-password", { email })
       toast.success(res.data.message)
       return true
     } catch (error) {
@@ -149,7 +155,8 @@ export const useAuthStore = create((set, get) => ({
   resetPassword: async (email, otp, newPassword, navigate) => {
     set({ isResettingPassword: true })
     try {
-      const res = await axiosInstance.post("/auth/reset-password", { email, otp, newPassword })
+      // const res = await axiosInstance.post("/auth/reset-password", { email, otp, newPassword })
+      const res = await axiosInstance.post("/reset-password", { email, otp, newPassword })
       toast.success(res.data.message)
       if (navigate) {
         navigate("/login")
