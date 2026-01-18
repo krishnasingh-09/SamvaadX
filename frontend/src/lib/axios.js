@@ -1,35 +1,33 @@
 // frontend/src/lib/axios.js
 import axios from "axios";
 
-const API_URL = import.meta.env.MODE === "development"
-  ? "http://localhost:3000/api"
-  : (import.meta.env.VITE_API_URL || "https://samvaadx-backend.onrender.com") + "/api";
+// ALWAYS use env-based backend URL
+const API_URL =
+  import.meta.env.VITE_BACKEND_URL + "/api";
 
 export const axiosInstance = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  withCredentials: true, // ✅ REQUIRED for cookies / auth
 });
 
-// Add response interceptor for debugging
+// Response interceptor (keep this – it’s good)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      // Server responded with error status
-      console.error("[v0] Response error:", {
+      console.error("[Axios Response Error]", {
         status: error.response.status,
         statusText: error.response.statusText,
         data: error.response.data,
       });
     } else if (error.request) {
-      // Request made but no response received
-      console.error("[v0] Request error:", {
+      console.error("[Axios Request Error]", {
         message: error.message,
         url: error.config?.url,
         method: error.config?.method,
       });
     } else {
-      console.error("[v0] Axios error:", error.message);
+      console.error("[Axios Error]", error.message);
     }
     return Promise.reject(error);
   }

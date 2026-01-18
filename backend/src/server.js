@@ -1,68 +1,67 @@
-import express from "express"
-import cookieParser from "cookie-parser"
-import path from "path"
-import cors from "cors"
+import express from "express";
+import cookieParser from "cookie-parser";
+import path from "path";
+import cors from "cors";
 
-import authRoutes from "./routes/auth.route.js"
-import messageRoutes from "./routes/message.route.js"
-import chatRequestRoutes from "./routes/chat-request.route.js"
-import { connectDB } from "./lib/db.js"
-import { ENV } from "./lib/env.js"
-import { app, server } from "./lib/socket.js"
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import chatRequestRoutes from "./routes/chat-request.route.js";
+import { connectDB } from "./lib/db.js";
+import { ENV } from "./lib/env.js";
+import { app, server } from "./lib/socket.js";
 
-const __dirname = path.resolve()
+const __dirname = path.resolve();
+const PORT = ENV.PORT || 3000;
 
-const PORT = ENV.PORT || 3000
+// ===== CORS FIX =====
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.CLIENT_URL,
+  process.env.SOCKET_IO_CORS_ORIGIN,
+];
 
-// CORS Configuration
-const corsOptions = {
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      // Development
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://127.0.0.1:5173",
-      "http://127.0.0.1:3000",
-      // Production - Vercel Frontend
-      "https://samvaad-x-zxnv1.vercel.app",
-      // Production - Render Backend
-      "https://samvaadx-backend.onrender.com",
-    ];
-    
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
-};
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-app.use(cors(corsOptions));
-app.use(express.json({ limit: "5mb" })) // req.body
-app.use(cookieParser())
+app.options("*", cors());
+// ====================
 
-app.use("/api/auth", authRoutes)
-app.use("/api/messages", messageRoutes)
-app.use("/api/chat-requests", chatRequestRoutes)
+app.use(express.json({ limit: "5mb" }));
+app.use(cookieParser());
 
-// make ready for deployment
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/chat-requests", chatRequestRoutes);
+
+// Serve frontend in production
 if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")))
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
   app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"))
-  })
+    res.sendFile(
+      path.join(__dirname, "../frontend", "dist", "index.html")
+    );
+  });
 }
 
 server.listen(PORT, () => {
-  console.log("Server running on port: " + PORT)
-  connectDB()
-})
+  console.log("Server running on port: " + PORT);
+  connectDB();
+});
+
 
 
 
