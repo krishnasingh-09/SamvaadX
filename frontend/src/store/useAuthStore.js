@@ -32,7 +32,9 @@ export const useAuthStore = create((set, get) => ({
   signup: async (data, navigate) => {
     set({ isSigningUp: true })
     try {
-      const res = await axiosInstance.post("/auth/signup", data)
+      //const res = await axiosInstance.post("/auth/signup", data)
+       const res = await axiosInstance.post("/signup", data)
+
 
       if (res.data.requiresOTP) {
         toast.success("OTP sent to your email. Please verify to complete signup.")
