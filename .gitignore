@@ -7,7 +7,6 @@ yarn-debug.log*
 yarn-error.log*
 yarn-lock.log*
 pnpm-lock.yaml
-package-lock.json
 .pnpm-debug.log*
 
 # ==========================================
