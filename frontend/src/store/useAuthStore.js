@@ -3,7 +3,6 @@ import { axiosInstance } from "../lib/axios"
 import toast from "react-hot-toast"
 import { io } from "socket.io-client"
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/"
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -116,9 +115,14 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  connectSocket: () => {
-  const { authUser } = get();
-  if (!authUser || get().socket?.connected) return;
+connectSocket: () => {
+  const { authUser, socket: existingSocket } = get();
+  if (!authUser) return;
+
+  // 🔥 clean up old socket if exists
+  if (existingSocket) {
+    existingSocket.disconnect();
+  }
 
   const socket = io(import.meta.env.VITE_BACKEND_URL, {
     withCredentials: true,
